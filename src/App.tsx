@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, SyntheticEvent } from "react";
 import { Route, Switch, Link } from "react-router-dom";
 
 import { db, auth, googleProvider } from "./config/firebase";
@@ -19,6 +19,8 @@ import {
 
 import { signOut } from "firebase/auth";
 
+import MainPage from "./MainPage";
+
 import All from "./All";
 import Active from "./Active";
 import Completed from "./Completed";
@@ -33,18 +35,38 @@ function App() {
   const [themeToggled, setThemeToggled] = useState<boolean>(false);
   const appRef = useRef<HTMLDivElement>(null);
   const dotRef = useRef<HTMLDivElement>(null);
+  const navHeaderRefs = [
+    useRef<HTMLParagraphElement>(null),
+    useRef<HTMLParagraphElement>(null),
+    useRef<HTMLParagraphElement>(null),
+  ];
 
   const [inputText, setInputText] = useState<string>("");
-
   const [dbData, setDbData] = useState<todoType>([]);
-
   const [profile, setProfile] = useState<any>("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [isLoggedIn, setIsLoggedIn] = useState<Boolean>(false);
 
   const toggleTheme = () => {
     setThemeToggled(!themeToggled);
 
     appRef.current?.classList.toggle("dark");
     dotRef.current?.classList.toggle("dotAnimation");
+  };
+
+  const toggleActiveNavClass = (e: SyntheticEvent) => {
+    const clicked = Number(e.currentTarget.getAttribute("data-value"));
+
+    navHeaderRefs.forEach((element, index) => {
+      const header = element.current;
+
+      if (index === clicked) {
+        header?.classList.add("activeNav");
+      } else {
+        header?.classList.remove("activeNav");
+      }
+    });
   };
 
   const getTodo = async () => {
@@ -121,22 +143,6 @@ function App() {
     }
   };
 
-  const logOut = async () => {
-    try {
-      await signOut(auth);
-      setIsLoggedIn(false);
-
-      setEmail("");
-      setPassword("");
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [isLoggedIn, setIsLoggedIn] = useState<Boolean>(false);
-
   const createAccount = async () => {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
@@ -173,6 +179,18 @@ function App() {
     }
   };
 
+  const logOut = async () => {
+    try {
+      await signOut(auth);
+      setIsLoggedIn(false);
+
+      setEmail("");
+      setPassword("");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   //refresh todos when logging in or out
   useEffect(() => {
     getTodo();
@@ -180,13 +198,10 @@ function App() {
     console.log(auth.currentUser?.email);
   }, [isLoggedIn]);
 
-  //get new todo list when current user changes
+  //get new todo list and set profile when current user changes
   useEffect(() => {
     getTodo();
-  }, [auth?.currentUser]);
 
-  //set profile email
-  useEffect(() => {
     if (auth.currentUser) {
       setProfile(auth?.currentUser?.email);
     }
@@ -197,13 +212,14 @@ function App() {
   return (
     <div className="App" ref={appRef}>
       <div className="signInPage">
-        <form className="flex flex-col gap-5 items-center mt-10">
+        <form className="flex flex-col gap-5 items-center">
           <input
             className="w-full md:w-2/3 xl:w-1/2"
             type="text"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
           />
 
           <input
@@ -214,6 +230,7 @@ function App() {
             onChange={(e) => {
               setPassword(e.target.value);
             }}
+            required
           />
 
           <div className="flex flex-row gap-5">
@@ -261,7 +278,7 @@ function App() {
           <p className={`${themeToggled ? "font-bold" : ""}`}>Dark</p>
         </div>
 
-        <div className=" flex flex-row items-center gap-5">
+        <div className=" flex flex-col md:flex-row items-center gap-2 md:gap-5">
           <p className="text-black dark:text-white">
             Logged in : <span className=" font-bold">{profile}</span>
           </p>
@@ -296,21 +313,43 @@ function App() {
               id="message"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
+              required
             />
             <button>Submit</button>
           </form>
 
           <nav>
             <Link to={"/"}>
-              <p className="navPage">All</p>
+              <p
+                className="navPage activeNav"
+                ref={navHeaderRefs[0]}
+                data-value={0}
+                onClick={toggleActiveNavClass}
+              >
+                All
+              </p>
             </Link>
 
             <Link to={"/Active"}>
-              <p className="navPage">Active</p>
+              <p
+                className="navPage"
+                ref={navHeaderRefs[1]}
+                data-value={1}
+                onClick={toggleActiveNavClass}
+              >
+                Active
+              </p>
             </Link>
 
             <Link to={"/Completed"}>
-              <p className="navPage">Completed</p>
+              <p
+                className="navPage"
+                ref={navHeaderRefs[2]}
+                data-value={2}
+                onClick={toggleActiveNavClass}
+              >
+                Completed
+              </p>
             </Link>
           </nav>
         </div>
