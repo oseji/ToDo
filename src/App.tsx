@@ -1,15 +1,8 @@
-import { useState, useRef, useEffect, SyntheticEvent } from "react";
-import { Route, Switch, Link } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
+import { Route, Switch } from "react-router-dom";
 
 import { db, auth, googleProvider } from "./config/firebase";
-import {
-  getDocs,
-  addDoc,
-  deleteDoc,
-  updateDoc,
-  doc,
-  collection,
-} from "firebase/firestore";
+import { getDocs, collection } from "firebase/firestore";
 
 import {
   createUserWithEmailAndPassword,
@@ -17,15 +10,9 @@ import {
   signInWithPopup,
 } from "firebase/auth";
 
-import { signOut } from "firebase/auth";
-
 import MainPage from "./MainPage";
 
-import All from "./All";
-import Active from "./Active";
-import Completed from "./Completed";
-
-type todoType = {
+export type todoType = {
   id: string;
   text: string;
   completed: boolean;
@@ -33,40 +20,20 @@ type todoType = {
 
 function App() {
   const [themeToggled, setThemeToggled] = useState<boolean>(false);
-  const appRef = useRef<HTMLDivElement>(null);
   const dotRef = useRef<HTMLDivElement>(null);
-  const navHeaderRefs = [
-    useRef<HTMLParagraphElement>(null),
-    useRef<HTMLParagraphElement>(null),
-    useRef<HTMLParagraphElement>(null),
-  ];
+  const appRef = useRef<HTMLDivElement>(null);
 
-  const [inputText, setInputText] = useState<string>("");
-  const [dbData, setDbData] = useState<todoType>([]);
-  const [profile, setProfile] = useState<any>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [isLoggedIn, setIsLoggedIn] = useState<Boolean>(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+
+  const [dbData, setDbData] = useState<todoType>([]);
 
   const toggleTheme = () => {
     setThemeToggled(!themeToggled);
 
     appRef.current?.classList.toggle("dark");
     dotRef.current?.classList.toggle("dotAnimation");
-  };
-
-  const toggleActiveNavClass = (e: SyntheticEvent) => {
-    const clicked = Number(e.currentTarget.getAttribute("data-value"));
-
-    navHeaderRefs.forEach((element, index) => {
-      const header = element.current;
-
-      if (index === clicked) {
-        header?.classList.add("activeNav");
-      } else {
-        header?.classList.remove("activeNav");
-      }
-    });
   };
 
   const getTodo = async () => {
@@ -88,58 +55,6 @@ function App() {
       }
     } catch (err) {
       console.error(err);
-    }
-  };
-
-  const addTodo = async () => {
-    const user = auth.currentUser;
-    try {
-      if (user) {
-        await addDoc(collection(db, `users/${user.email}/userTodos`), {
-          text: inputText,
-          completed: false,
-          userID: auth?.currentUser?.uid,
-        });
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      getTodo();
-    }
-  };
-
-  const deleteTodo = async (id: string) => {
-    const user = auth.currentUser;
-
-    try {
-      if (user) {
-        const todoDoc = doc(
-          collection(db, `users/${user.email}/userTodos`),
-          id
-        );
-        await deleteDoc(todoDoc);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      getTodo();
-    }
-  };
-
-  const editTodoText = async (id: string, newText: string) => {
-    const user = auth.currentUser;
-    try {
-      if (user) {
-        const todoDoc = doc(
-          collection(db, `users/${user.email}/userTodos`),
-          id
-        );
-        await updateDoc(todoDoc, { text: newText });
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      getTodo();
     }
   };
 
@@ -179,35 +94,12 @@ function App() {
     }
   };
 
-  const logOut = async () => {
-    try {
-      await signOut(auth);
-      setIsLoggedIn(false);
-
-      setEmail("");
-      setPassword("");
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   //refresh todos when logging in or out
   useEffect(() => {
     getTodo();
     console.log(isLoggedIn);
     console.log(auth.currentUser?.email);
   }, [isLoggedIn]);
-
-  //get new todo list and set profile when current user changes
-  useEffect(() => {
-    getTodo();
-
-    if (auth.currentUser) {
-      setProfile(auth?.currentUser?.email);
-    }
-
-    console.log(profile);
-  }, [auth?.currentUser]);
 
   return (
     <div className="App" ref={appRef}>
@@ -267,107 +159,23 @@ function App() {
         </form>
       </div>
 
-      <header>
-        <div className="themeGrp">
-          <p className={`${!themeToggled ? "font-bold" : ""}`}>Light</p>
-
-          <div className="themeSwitcher" onClick={toggleTheme}>
-            <div className="dot" ref={dotRef}></div>
-          </div>
-
-          <p className={`${themeToggled ? "font-bold" : ""}`}>Dark</p>
-        </div>
-
-        <div className=" flex flex-col md:flex-row items-center gap-2 md:gap-5">
-          <p className="text-black dark:text-white">
-            Logged in : <span className=" font-bold">{profile}</span>
-          </p>
-
-          <button
-            className=" bg-blue-500 rounded-xl px-4 py-2 text-white"
-            onClick={(e) => {
-              e.preventDefault();
-              logOut();
-            }}
-          >
-            Log out
-          </button>
-        </div>
-      </header>
-
-      <main>
-        <div className="todoNav">
-          <form
-            className="flex flex-col md:flex-row md:justify-center gap-5 md:gap-10 items-center mt-10"
-            onSubmit={(e) => {
-              e.preventDefault();
-              addTodo();
-              setInputText("");
-            }}
-          >
-            <input
-              className="w-full md:w-2/3 xl:w-1/2"
-              placeholder="Enter todo"
-              type="text"
-              name="message"
-              id="message"
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              required
-            />
-            <button>Submit</button>
-          </form>
-
-          <nav>
-            <Link to={"/"}>
-              <p
-                className="navPage activeNav"
-                ref={navHeaderRefs[0]}
-                data-value={0}
-                onClick={toggleActiveNavClass}
-              >
-                All
-              </p>
-            </Link>
-
-            <Link to={"/Active"}>
-              <p
-                className="navPage"
-                ref={navHeaderRefs[1]}
-                data-value={1}
-                onClick={toggleActiveNavClass}
-              >
-                Active
-              </p>
-            </Link>
-
-            <Link to={"/Completed"}>
-              <p
-                className="navPage"
-                ref={navHeaderRefs[2]}
-                data-value={2}
-                onClick={toggleActiveNavClass}
-              >
-                Completed
-              </p>
-            </Link>
-          </nav>
-        </div>
-
-        <Switch>
-          <Route exact path={"/"}>
-            <All
-              dbData={dbData}
-              deleteTodo={deleteTodo}
-              editTodoText={editTodoText}
-            />
-          </Route>
-
-          <Route exact path={"/Active"} component={Active} />
-
-          <Route exact path={"/Completed"} component={Completed} />
-        </Switch>
-      </main>
+      <Switch>
+        <Route>
+          <MainPage
+            dotRef={dotRef}
+            themeToggled={themeToggled}
+            toggleTheme={toggleTheme}
+            getTodo={getTodo}
+            email={email}
+            setEmail={setEmail}
+            password={password}
+            setPassword={setPassword}
+            isLoggedIn={isLoggedIn}
+            setIsLoggedIn={setIsLoggedIn}
+            dbData={dbData}
+          ></MainPage>
+        </Route>
+      </Switch>
     </div>
   );
 }
