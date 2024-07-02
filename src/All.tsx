@@ -64,7 +64,7 @@ const All = (props: allPagePageProps) => {
                   type="text"
                   className="editTodo"
                   value={editedText}
-                  placeholder="Edit your ToDo"
+                  placeholder="Edit your todo"
                   onChange={(e) => setEditedText(e.target.value)}
                   required
                 />

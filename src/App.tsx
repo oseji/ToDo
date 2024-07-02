@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Route, Switch, Link } from "react-router-dom";
 
-import { db, auth } from "./config/firebase";
+import { db, auth, googleProvider } from "./config/firebase";
 import {
   getDocs,
   addDoc,
@@ -11,7 +11,14 @@ import {
   collection,
 } from "firebase/firestore";
 
-import AuthScreen from "./Auth";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+} from "firebase/auth";
+
+import { signOut } from "firebase/auth";
+
 import All from "./All";
 import Active from "./Active";
 import Completed from "./Completed";
@@ -29,10 +36,6 @@ function App() {
 
   const [inputText, setInputText] = useState<string>("");
 
-  // const todoCollection = query(
-  //   collection(db, "users"),
-  //   where("userID", "==", auth?.currentUser?.uid)
-  // );
   const [dbData, setDbData] = useState<todoType>([]);
 
   const [profile, setProfile] = useState<any>("");
@@ -118,10 +121,64 @@ function App() {
     }
   };
 
-  //get todo list immediately upon page load
+  const logOut = async () => {
+    try {
+      await signOut(auth);
+      setIsLoggedIn(false);
+
+      setEmail("");
+      setPassword("");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [isLoggedIn, setIsLoggedIn] = useState<Boolean>(false);
+
+  const createAccount = async () => {
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      setIsLoggedIn(true);
+    } catch (err) {
+      console.error(err);
+      setIsLoggedIn(false);
+    }
+  };
+
+  const signIn = async () => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      setIsLoggedIn(true);
+
+      setEmail("");
+      setPassword("");
+    } catch (err) {
+      console.error(err);
+      setIsLoggedIn(false);
+    }
+  };
+
+  const signInWithGoogle = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+      setIsLoggedIn(true);
+
+      setEmail("");
+      setPassword("");
+    } catch (err) {
+      console.error(err);
+      setIsLoggedIn(false);
+    }
+  };
+
+  //refresh todos when logging in or out
   useEffect(() => {
     getTodo();
-  }, []);
+    console.log(isLoggedIn);
+    console.log(auth.currentUser?.email);
+  }, [isLoggedIn]);
 
   //get new todo list when current user changes
   useEffect(() => {
@@ -130,12 +187,69 @@ function App() {
 
   //set profile email
   useEffect(() => {
-    setProfile(auth?.currentUser?.email);
+    if (auth.currentUser) {
+      setProfile(auth?.currentUser?.email);
+    }
+
     console.log(profile);
   }, [auth?.currentUser]);
 
   return (
     <div className="App" ref={appRef}>
+      <div className="signInPage">
+        <form className="flex flex-col gap-5 items-center mt-10">
+          <input
+            className="w-full md:w-2/3 xl:w-1/2"
+            type="text"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+
+          <input
+            className="w-full md:w-2/3 xl:w-1/2"
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+            }}
+          />
+
+          <div className="flex flex-row gap-5">
+            <button
+              className=" bg-blue-500 rounded-xl px-4 py-2 text-white"
+              onClick={(e) => {
+                e.preventDefault();
+                createAccount();
+              }}
+            >
+              Create account
+            </button>
+
+            <button
+              className=" bg-blue-500 rounded-xl px-4 py-2 text-white"
+              onClick={(e) => {
+                e.preventDefault();
+                signIn();
+              }}
+            >
+              Sign in
+            </button>
+          </div>
+
+          <button
+            className=" bg-blue-500 rounded-xl px-4 py-2 text-white"
+            onClick={(e) => {
+              e.preventDefault();
+              signInWithGoogle();
+            }}
+          >
+            Sign in with Google
+          </button>
+        </form>
+      </div>
+
       <header>
         <div className="themeGrp">
           <p className={`${!themeToggled ? "font-bold" : ""}`}>Light</p>
@@ -147,45 +261,60 @@ function App() {
           <p className={`${themeToggled ? "font-bold" : ""}`}>Dark</p>
         </div>
 
-        <p>{profile}</p>
+        <div className=" flex flex-row items-center gap-5">
+          <p className="text-black dark:text-white">
+            Logged in : <span className=" font-bold">{profile}</span>
+          </p>
 
-        <nav>
-          <Link to={"/"}>
-            <p className="navPage">All</p>
-          </Link>
-
-          <Link to={"/Active"}>
-            <p className="navPage">Active</p>
-          </Link>
-
-          <Link to={"/Completed"}>
-            <p className="navPage">Completed</p>
-          </Link>
-        </nav>
+          <button
+            className=" bg-blue-500 rounded-xl px-4 py-2 text-white"
+            onClick={(e) => {
+              e.preventDefault();
+              logOut();
+            }}
+          >
+            Log out
+          </button>
+        </div>
       </header>
 
-      <form
-        className="flex flex-col md:flex-row md:justify-center gap-5 md:gap-10 items-center mt-10"
-        onSubmit={(e) => {
-          e.preventDefault();
-          addTodo();
-          setInputText("");
-        }}
-      >
-        <input
-          className="w-full md:w-2/3 xl:w-1/2"
-          type="text"
-          name="message"
-          id="message"
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-        />
-        <button className="formBtn">Submit</button>
-      </form>
-
-      <AuthScreen getTodo={getTodo} />
-
       <main>
+        <div className="todoNav">
+          <form
+            className="flex flex-col md:flex-row md:justify-center gap-5 md:gap-10 items-center mt-10"
+            onSubmit={(e) => {
+              e.preventDefault();
+              addTodo();
+              setInputText("");
+            }}
+          >
+            <input
+              className="w-full md:w-2/3 xl:w-1/2"
+              placeholder="Enter todo"
+              type="text"
+              name="message"
+              id="message"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+            />
+            <button>Submit</button>
+          </form>
+
+          <nav>
+            <Link to={"/"}>
+              <p className="navPage">All</p>
+            </Link>
+
+            <Link to={"/Active"}>
+              <p className="navPage">Active</p>
+            </Link>
+
+            <Link to={"/Completed"}>
+              <p className="navPage">Completed</p>
+            </Link>
+          </nav>
+        </div>
+
         <Switch>
           <Route exact path={"/"}>
             <All
