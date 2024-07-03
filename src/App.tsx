@@ -103,79 +103,85 @@ function App() {
 
   return (
     <div className="App" ref={appRef}>
-      <div className="signInPage">
-        <form className="flex flex-col gap-5 items-center">
-          <input
-            className="w-full md:w-2/3 xl:w-1/2"
-            type="text"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+      {!isLoggedIn && (
+        <div className="signInPage">
+          <h1 className="xl:text-6xl md:text-5xl text-3xl">ToDo</h1>
 
-          <input
-            className="w-full md:w-2/3 xl:w-1/2"
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-            }}
-            required
-          />
+          <form className="flex flex-col gap-5 items-center">
+            <input
+              className="w-full md:w-2/3 xl:w-1/2"
+              type="text"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
 
-          <div className="flex flex-row gap-5">
+            <input
+              className="w-full md:w-2/3 xl:w-1/2"
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+              }}
+              required
+            />
+
+            <div className="flex flex-row gap-5">
+              <button
+                className=" bg-blue-500 rounded-xl px-4 py-2 text-white"
+                onClick={(e) => {
+                  e.preventDefault();
+                  createAccount();
+                }}
+              >
+                Create account
+              </button>
+
+              <button
+                className=" bg-blue-500 rounded-xl px-4 py-2 text-white"
+                onClick={(e) => {
+                  e.preventDefault();
+                  signIn();
+                }}
+              >
+                Sign in
+              </button>
+            </div>
+
             <button
               className=" bg-blue-500 rounded-xl px-4 py-2 text-white"
               onClick={(e) => {
                 e.preventDefault();
-                createAccount();
+                signInWithGoogle();
               }}
             >
-              Create account
+              Sign in with Google
             </button>
+          </form>
+        </div>
+      )}
 
-            <button
-              className=" bg-blue-500 rounded-xl px-4 py-2 text-white"
-              onClick={(e) => {
-                e.preventDefault();
-                signIn();
-              }}
-            >
-              Sign in
-            </button>
-          </div>
-
-          <button
-            className=" bg-blue-500 rounded-xl px-4 py-2 text-white"
-            onClick={(e) => {
-              e.preventDefault();
-              signInWithGoogle();
-            }}
-          >
-            Sign in with Google
-          </button>
-        </form>
-      </div>
-
-      <Switch>
-        <Route>
-          <MainPage
-            dotRef={dotRef}
-            themeToggled={themeToggled}
-            toggleTheme={toggleTheme}
-            getTodo={getTodo}
-            email={email}
-            setEmail={setEmail}
-            password={password}
-            setPassword={setPassword}
-            isLoggedIn={isLoggedIn}
-            setIsLoggedIn={setIsLoggedIn}
-            dbData={dbData}
-          ></MainPage>
-        </Route>
-      </Switch>
+      {isLoggedIn && (
+        <Switch>
+          <Route>
+            <MainPage
+              dotRef={dotRef}
+              themeToggled={themeToggled}
+              toggleTheme={toggleTheme}
+              getTodo={getTodo}
+              email={email}
+              setEmail={setEmail}
+              password={password}
+              setPassword={setPassword}
+              isLoggedIn={isLoggedIn}
+              setIsLoggedIn={setIsLoggedIn}
+              dbData={dbData}
+            ></MainPage>
+          </Route>
+        </Switch>
+      )}
     </div>
   );
 }

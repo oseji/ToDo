@@ -160,7 +160,7 @@ const MainPage = (props: mainPageProps) => {
 
         <div className=" flex flex-col md:flex-row items-center gap-2 md:gap-5">
           <p className="text-black dark:text-white">
-            Logged in : <span className=" font-bold">{profile}</span>
+            Logged in as : <span className=" font-bold">{profile}</span>
           </p>
 
           <button
@@ -175,65 +175,65 @@ const MainPage = (props: mainPageProps) => {
         </div>
       </header>
 
+      <div className="todoNav">
+        <form
+          className="flex flex-col md:flex-row md:justify-center gap-5 md:gap-10 items-center mt-10"
+          onSubmit={(e) => {
+            e.preventDefault();
+            addTodo();
+            setInputText("");
+          }}
+        >
+          <input
+            className="w-full md:w-2/3 xl:w-1/2"
+            placeholder="Enter todo"
+            type="text"
+            name="message"
+            id="message"
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            required
+          />
+          <button>Submit</button>
+        </form>
+
+        <nav>
+          <Link to={"/"}>
+            <p
+              className="navPage activeNav"
+              ref={navHeaderRefs[0]}
+              data-value={0}
+              onClick={toggleActiveNavClass}
+            >
+              All
+            </p>
+          </Link>
+
+          <Link to={"/Active"}>
+            <p
+              className="navPage"
+              ref={navHeaderRefs[1]}
+              data-value={1}
+              onClick={toggleActiveNavClass}
+            >
+              Active
+            </p>
+          </Link>
+
+          <Link to={"/Completed"}>
+            <p
+              className="navPage"
+              ref={navHeaderRefs[2]}
+              data-value={2}
+              onClick={toggleActiveNavClass}
+            >
+              Completed
+            </p>
+          </Link>
+        </nav>
+      </div>
+
       <main>
-        <div className="todoNav">
-          <form
-            className="flex flex-col md:flex-row md:justify-center gap-5 md:gap-10 items-center mt-10"
-            onSubmit={(e) => {
-              e.preventDefault();
-              addTodo();
-              setInputText("");
-            }}
-          >
-            <input
-              className="w-full md:w-2/3 xl:w-1/2"
-              placeholder="Enter todo"
-              type="text"
-              name="message"
-              id="message"
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              required
-            />
-            <button>Submit</button>
-          </form>
-
-          <nav>
-            <Link to={"/"}>
-              <p
-                className="navPage activeNav"
-                ref={navHeaderRefs[0]}
-                data-value={0}
-                onClick={toggleActiveNavClass}
-              >
-                All
-              </p>
-            </Link>
-
-            <Link to={"/Active"}>
-              <p
-                className="navPage"
-                ref={navHeaderRefs[1]}
-                data-value={1}
-                onClick={toggleActiveNavClass}
-              >
-                Active
-              </p>
-            </Link>
-
-            <Link to={"/Completed"}>
-              <p
-                className="navPage"
-                ref={navHeaderRefs[2]}
-                data-value={2}
-                onClick={toggleActiveNavClass}
-              >
-                Completed
-              </p>
-            </Link>
-          </nav>
-        </div>
-
         <Switch>
           <Route exact path={"/"}>
             <All
