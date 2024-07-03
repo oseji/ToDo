@@ -103,9 +103,10 @@ function App() {
 
   return (
     <div className="App" ref={appRef}>
+      {/* SIGN IN PAGE */}
       {!isLoggedIn && (
         <div className="signInPage">
-          <h1 className="xl:text-6xl md:text-5xl text-3xl">ToDo</h1>
+          <h1 className="signInHeading">ToDo</h1>
 
           <form className="flex flex-col gap-5 items-center">
             <input
@@ -130,39 +131,38 @@ function App() {
 
             <div className="flex flex-row gap-5">
               <button
-                className=" bg-blue-500 rounded-xl px-4 py-2 text-white"
                 onClick={(e) => {
                   e.preventDefault();
-                  createAccount();
+                  signInWithGoogle();
                 }}
               >
-                Create account
+                Sign in with Google
               </button>
 
               <button
-                className=" bg-blue-500 rounded-xl px-4 py-2 text-white"
                 onClick={(e) => {
                   e.preventDefault();
                   signIn();
                 }}
               >
-                Sign in
+                Log in
               </button>
             </div>
 
-            <button
-              className=" bg-blue-500 rounded-xl px-4 py-2 text-white"
+            <p
+              className=" text-blue-500 underline cursor-pointer hover:scale-110 transition ease-in-out duration-200"
               onClick={(e) => {
                 e.preventDefault();
-                signInWithGoogle();
+                createAccount();
               }}
             >
-              Sign in with Google
-            </button>
+              Click to create account and login
+            </p>
           </form>
         </div>
       )}
 
+      {/* MAIN SCREEN PAGE */}
       {isLoggedIn && (
         <Switch>
           <Route>

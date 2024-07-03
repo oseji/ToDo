@@ -177,7 +177,7 @@ const MainPage = (props: mainPageProps) => {
 
       <div className="todoNav">
         <form
-          className="flex flex-col md:flex-row md:justify-center gap-5 md:gap-10 items-center mt-10"
+          className="flex flex-col md:flex-row md:justify-center gap-5 md:gap-10 items-center "
           onSubmit={(e) => {
             e.preventDefault();
             addTodo();
