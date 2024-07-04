@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import { Route, Switch } from "react-router-dom";
 
 import { db, auth, googleProvider } from "./config/firebase";
 import { getDocs, collection } from "firebase/firestore";
@@ -30,10 +29,22 @@ function App() {
   const [dbData, setDbData] = useState<todoType>([]);
 
   const toggleTheme = () => {
-    setThemeToggled(!themeToggled);
+    //check if dark mode is applied
+    const isDarkModeApplied = appRef.current?.classList.contains("dark");
 
-    appRef.current?.classList.toggle("dark");
-    dotRef.current?.classList.toggle("dotAnimation");
+    //determine current theme
+    const newTheme = isDarkModeApplied ? "light" : "dark";
+
+    //apply new theme manually and trigger dot animation
+    if (newTheme === "dark") {
+      appRef.current?.classList.add("dark");
+      dotRef.current?.classList.add("dotAnimation");
+    } else {
+      appRef.current?.classList.remove("dark");
+      dotRef.current?.classList.remove("dotAnimation");
+    }
+
+    setThemeToggled(!themeToggled);
   };
 
   const getTodo = async () => {
@@ -93,6 +104,22 @@ function App() {
       setIsLoggedIn(false);
     }
   };
+
+  //check for user preference on page load and set theme accordingly
+  useEffect(() => {
+    const isDarkModePreferred = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    ).matches;
+    const currentTheme = isDarkModePreferred ? "dark" : "light";
+
+    if (currentTheme === "dark") {
+      appRef.current?.classList.add("dark");
+      dotRef.current?.classList.add("dotAnimation");
+    } else {
+      appRef.current?.classList.remove("dark");
+      dotRef.current?.classList.remove("dotAnimation");
+    }
+  }, [window.matchMedia("(prefers-color-scheme: dark)").matches]);
 
   //refresh todos when logging in or out
   useEffect(() => {
@@ -164,23 +191,19 @@ function App() {
 
       {/* MAIN SCREEN PAGE */}
       {isLoggedIn && (
-        <Switch>
-          <Route>
-            <MainPage
-              dotRef={dotRef}
-              themeToggled={themeToggled}
-              toggleTheme={toggleTheme}
-              getTodo={getTodo}
-              email={email}
-              setEmail={setEmail}
-              password={password}
-              setPassword={setPassword}
-              isLoggedIn={isLoggedIn}
-              setIsLoggedIn={setIsLoggedIn}
-              dbData={dbData}
-            ></MainPage>
-          </Route>
-        </Switch>
+        <MainPage
+          dotRef={dotRef}
+          themeToggled={themeToggled}
+          toggleTheme={toggleTheme}
+          getTodo={getTodo}
+          email={email}
+          setEmail={setEmail}
+          password={password}
+          setPassword={setPassword}
+          isLoggedIn={isLoggedIn}
+          setIsLoggedIn={setIsLoggedIn}
+          dbData={dbData}
+        ></MainPage>
       )}
     </div>
   );
