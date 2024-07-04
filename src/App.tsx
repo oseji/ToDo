@@ -18,7 +18,13 @@ export type todoType = {
 }[];
 
 function App() {
-  const [themeToggled, setThemeToggled] = useState<boolean>(false);
+  const isDarkModePreferred = window.matchMedia(
+    "(prefers-color-scheme: dark)"
+  ).matches;
+
+  const [themeToggled, setThemeToggled] = useState<boolean>(
+    isDarkModePreferred ? true : false
+  );
   const dotRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<HTMLDivElement>(null);
 
@@ -39,12 +45,12 @@ function App() {
     if (newTheme === "dark") {
       appRef.current?.classList.add("dark");
       dotRef.current?.classList.add("dotAnimation");
+      setThemeToggled(true);
     } else {
       appRef.current?.classList.remove("dark");
       dotRef.current?.classList.remove("dotAnimation");
+      setThemeToggled(false);
     }
-
-    setThemeToggled(!themeToggled);
   };
 
   const getTodo = async () => {
@@ -107,9 +113,6 @@ function App() {
 
   //check for user preference on page load and set theme accordingly
   useEffect(() => {
-    const isDarkModePreferred = window.matchMedia(
-      "(prefers-color-scheme: dark)"
-    ).matches;
     const currentTheme = isDarkModePreferred ? "dark" : "light";
 
     if (currentTheme === "dark") {

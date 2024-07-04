@@ -238,6 +238,7 @@ const MainPage = (props: mainPageProps) => {
           <Route exact path={"/"}>
             <All
               dbData={props.dbData}
+              getTodo={props.getTodo}
               deleteTodo={deleteTodo}
               editTodoText={editTodoText}
             />
