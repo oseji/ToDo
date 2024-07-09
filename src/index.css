@@ -78,7 +78,7 @@ main {
 }
 
 section {
-  @apply min-h-[50dvh] dark:bg-[#0D0D0D] bg-[#E9E9E9] p-3 md:p-5 rounded-xl mx-5 md:mx-10;
+  @apply min-h-[50dvh] dark:bg-[#0D0D0D] bg-[#E9E9E9] p-3 md:p-5 rounded-xl mx-5 md:mx-10 mb-8;
 }
 
 .sectionHeading {
@@ -111,7 +111,7 @@ section {
 }
 
 .editTodoGrp {
-  @apply flex flex-col md:flex-row gap-2 md:gap-5 items-center;
+  @apply w-full flex flex-col md:flex-row gap-2 md:gap-5 items-center;
 }
 
 .editTodo {

@@ -49,7 +49,6 @@ const Completed = (props: completedPagePageProps) => {
                   />
 
                   <div>
-                    <p className="todoId">ID : {e.id}</p>
                     <p
                       className={`todoText ${
                         e.completed ? " line-through" : ""
