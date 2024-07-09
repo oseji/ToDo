@@ -72,8 +72,6 @@ function App() {
         })) as todoType;
 
         setDbData(filteredData);
-
-        console.log(filteredData);
       }
     } catch (err) {
       console.error(err);
@@ -132,16 +130,7 @@ function App() {
   //refresh todos when logging in or out
   useEffect(() => {
     getTodo();
-    console.log(isLoggedIn);
-    console.log(auth.currentUser?.email);
   }, [isLoggedIn]);
-
-  //updating eye password icon
-  // useEffect(() => {
-  //   passwordType === "password" ? setEyeIcon(openEye) : setEyeIcon(closedEye);
-
-  //   console.log(passwordType);
-  // }, [passwordType]);
 
   return (
     <div className="App" ref={appRef}>
@@ -174,7 +163,7 @@ function App() {
               />
 
               <img
-                className="h-6"
+                className="h-6 cursor-pointer"
                 src={!passwordVisibile ? closedEye : openEye}
                 alt="eye icon"
                 onClick={() => {

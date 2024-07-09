@@ -127,7 +127,6 @@ const MainPage = (props: mainPageProps) => {
 
   const toggleEditForm = (textId: string) => {
     setEditingId((prev) => (prev === textId ? null : textId));
-    console.log(textId);
   };
 
   const updateCompletedStatus = async (
@@ -170,8 +169,6 @@ const MainPage = (props: mainPageProps) => {
     if (auth.currentUser) {
       setProfile(auth?.currentUser?.email);
     }
-
-    console.log(profile);
   }, [auth?.currentUser]);
 
   return (

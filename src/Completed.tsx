@@ -43,7 +43,6 @@ const Completed = (props: completedPagePageProps) => {
                     checked={e.completed}
                     onChange={(event: ChangeEvent<HTMLInputElement>) => {
                       const boxStatus = event.target.checked;
-                      console.log(boxStatus);
 
                       props.updateCompletedStatus(e.id, boxStatus);
                     }}
