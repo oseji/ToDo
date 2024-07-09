@@ -11,6 +11,9 @@ import {
 
 import MainPage from "./MainPage";
 
+import openEye from "./assets/openEye.svg";
+import closedEye from "./assets/closedEye.svg";
+
 export type todoType = {
   id: string;
   text: string;
@@ -31,6 +34,8 @@ function App() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [passwordVisibile, setPasswordVisible] = useState<boolean>(false);
+  const passwordRef = useRef<HTMLInputElement>(null);
 
   const [dbData, setDbData] = useState<todoType>([]);
 
@@ -131,6 +136,13 @@ function App() {
     console.log(auth.currentUser?.email);
   }, [isLoggedIn]);
 
+  //updating eye password icon
+  // useEffect(() => {
+  //   passwordType === "password" ? setEyeIcon(openEye) : setEyeIcon(closedEye);
+
+  //   console.log(passwordType);
+  // }, [passwordType]);
+
   return (
     <div className="App" ref={appRef}>
       {/* SIGN IN PAGE */}
@@ -148,16 +160,34 @@ function App() {
               required
             />
 
-            <input
-              className="w-full md:w-2/3 xl:w-1/2"
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-              }}
-              required
-            />
+            <div className="passwordBox">
+              <input
+                className="w-full"
+                type="password"
+                placeholder="Password"
+                value={password}
+                ref={passwordRef}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                }}
+                required
+              />
+
+              <img
+                className="h-6"
+                src={!passwordVisibile ? closedEye : openEye}
+                alt="eye icon"
+                onClick={() => {
+                  setPasswordVisible(!passwordVisibile);
+                  const passwordType =
+                    passwordRef.current?.getAttribute("type") === "password"
+                      ? "text"
+                      : "password";
+
+                  passwordRef.current?.setAttribute("type", passwordType);
+                }}
+              />
+            </div>
 
             <div className="flex flex-row gap-5">
               <button

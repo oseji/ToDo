@@ -64,6 +64,10 @@ input {
   @apply outline-0 p-2 dark:bg-[#0D0D0D] bg-[#E9E9E9] rounded-xl;
 }
 
+.passwordBox {
+  @apply w-full md:w-2/3 xl:w-1/2 flex flex-row items-center gap-5  dark:bg-[#0D0D0D] bg-[#E9E9E9] rounded-xl px-2;
+}
+
 button {
   @apply min-w-36 bg-blue-500 text-white text-sm font-semibold px-4 py-2 rounded-xl capitalize hover:scale-110 transition ease-in-out duration-200;
 }
@@ -103,7 +107,7 @@ section {
 }
 
 .textGrp {
-  @apply flex flex-row items-center gap-5;
+  @apply flex flex-row items-center gap-2.5 md:gap-5;
 }
 
 .editTodoGrp {
