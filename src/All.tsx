@@ -1,6 +1,4 @@
-import { ChangeEvent, useState } from "react";
-import { auth, db } from "./config/firebase";
-import { updateDoc, doc, collection } from "firebase/firestore";
+import { ChangeEvent } from "react";
 
 type dbDataType = {
   id: string;
@@ -11,47 +9,33 @@ type dbDataType = {
 type getTodoType = () => Promise<void>;
 type deleteTodoType = (id: string) => Promise<void>;
 type editTodoTextType = (id: string, newText: string) => Promise<void>;
+type editedTextType = string;
+type setEditedTextType = (value: string) => void;
+type editingIdType = string | null;
+type setEditingIdType = (value: string | null) => void;
+type toggleEditFormType = (textId: string) => void;
+type updateCompletedStatusType = (
+  id: string,
+  completedStatus: boolean
+) => Promise<void>;
 
 type allPagePageProps = {
   dbData: dbDataType;
   getTodo: getTodoType;
   deleteTodo: deleteTodoType;
   editTodoText: editTodoTextType;
+  editedText: editedTextType;
+  setEditedText: setEditedTextType;
+  editingId: editingIdType;
+  setEditingId: setEditingIdType;
+  toggleEditForm: toggleEditFormType;
+  updateCompletedStatus: updateCompletedStatusType;
 };
 
 const All = (props: allPagePageProps) => {
-  const [editedText, setEditedText] = useState<string>("");
-  const [editingId, setEditingId] = useState<string | null>(null);
-
-  const toggleEditForm = (textId: string) => {
-    setEditingId((prev) => (prev === textId ? null : textId));
-    console.log(textId);
-  };
-
-  const updateCompletedStatus = async (
-    id: string,
-    completedStatus: boolean
-  ) => {
-    const user = auth.currentUser;
-
-    try {
-      if (user) {
-        const todoDoc = doc(
-          collection(db, `users/${user.email}/userTodos`),
-          id
-        );
-        await updateDoc(todoDoc, { completed: completedStatus });
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      props.getTodo();
-    }
-  };
-
   return (
     <section>
-      <h1 className="sectionHeading">All</h1>
+      <h1 className="sectionHeading">All ({props.dbData.length})</h1>
 
       <div className="todoGrp">
         {props?.dbData?.map((e, i) => (
@@ -66,7 +50,7 @@ const All = (props: allPagePageProps) => {
                     const boxStatus = event.target.checked;
                     console.log(boxStatus);
 
-                    updateCompletedStatus(e.id, boxStatus);
+                    props.updateCompletedStatus(e.id, boxStatus);
                   }}
                 />
 
@@ -85,31 +69,31 @@ const All = (props: allPagePageProps) => {
 
                 <button
                   onClick={() => {
-                    toggleEditForm(e.id);
+                    props.toggleEditForm(e.id);
                   }}
                 >
-                  {editingId === e.id ? "Close" : "Edit"}
+                  {props.editingId === e.id ? "Close" : "Edit"}
                 </button>
               </div>
             </div>
 
             {/* editing form */}
-            {editingId === e.id && (
+            {props.editingId === e.id && (
               <form
                 className="editTodoGrp"
                 onSubmit={(event) => {
                   event.preventDefault();
-                  props.editTodoText(e.id, editedText);
-                  setEditedText("");
-                  setEditingId(null);
+                  props.editTodoText(e.id, props.editedText);
+                  props.setEditedText("");
+                  props.setEditingId(null);
                 }}
               >
                 <input
                   type="text"
                   className="editTodo"
-                  value={editedText}
+                  value={props.editedText}
                   placeholder="Edit your todo"
-                  onChange={(e) => setEditedText(e.target.value)}
+                  onChange={(e) => props.setEditedText(e.target.value)}
                   required
                 />
                 <button>Submit</button>

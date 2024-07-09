@@ -56,6 +56,9 @@ const MainPage = (props: mainPageProps) => {
 
   const [profile, setProfile] = useState<any>("");
 
+  const [editedText, setEditedText] = useState<string>("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+
   const toggleActiveNavClass = (e: SyntheticEvent) => {
     const clicked = Number(e.currentTarget.getAttribute("data-value"));
 
@@ -114,6 +117,32 @@ const MainPage = (props: mainPageProps) => {
           id
         );
         await updateDoc(todoDoc, { text: newText });
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      props.getTodo();
+    }
+  };
+
+  const toggleEditForm = (textId: string) => {
+    setEditingId((prev) => (prev === textId ? null : textId));
+    console.log(textId);
+  };
+
+  const updateCompletedStatus = async (
+    id: string,
+    completedStatus: boolean
+  ) => {
+    const user = auth.currentUser;
+
+    try {
+      if (user) {
+        const todoDoc = doc(
+          collection(db, `users/${user.email}/userTodos`),
+          id
+        );
+        await updateDoc(todoDoc, { completed: completedStatus });
       }
     } catch (err) {
       console.error(err);
@@ -241,12 +270,38 @@ const MainPage = (props: mainPageProps) => {
               getTodo={props.getTodo}
               deleteTodo={deleteTodo}
               editTodoText={editTodoText}
+              editedText={editedText}
+              setEditedText={setEditedText}
+              editingId={editingId}
+              setEditingId={setEditingId}
+              toggleEditForm={toggleEditForm}
+              updateCompletedStatus={updateCompletedStatus}
             />
           </Route>
 
-          <Route exact path={"/Active"} component={Active} />
+          <Route path={"/Active"}>
+            <Active
+              dbData={props.dbData}
+              getTodo={props.getTodo}
+              deleteTodo={deleteTodo}
+              editTodoText={editTodoText}
+              editedText={editedText}
+              setEditedText={setEditedText}
+              editingId={editingId}
+              setEditingId={setEditingId}
+              toggleEditForm={toggleEditForm}
+              updateCompletedStatus={updateCompletedStatus}
+            ></Active>
+          </Route>
 
-          <Route exact path={"/Completed"} component={Completed} />
+          <Route path={"/Completed"}>
+            <Completed
+              dbData={props.dbData}
+              getTodo={props.getTodo}
+              deleteTodo={deleteTodo}
+              updateCompletedStatus={updateCompletedStatus}
+            ></Completed>
+          </Route>
         </Switch>
       </main>
     </div>
