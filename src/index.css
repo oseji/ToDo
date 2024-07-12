@@ -72,6 +72,10 @@ button {
   @apply min-w-36 bg-blue-500 text-white text-sm font-semibold px-4 py-2 rounded-xl capitalize hover:scale-110 transition ease-in-out duration-200;
 }
 
+.errorMessage {
+  @apply text-red-600 font-semibold text-sm;
+}
+
 /* main */
 main {
   @apply lg:mx-16 pb-10;

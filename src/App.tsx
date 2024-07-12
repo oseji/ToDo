@@ -30,12 +30,16 @@ function App() {
   );
   const dotRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<HTMLDivElement>(null);
+  const errorMessageRef = useRef<HTMLParagraphElement>(null);
 
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [passwordVisibile, setPasswordVisible] = useState<boolean>(false);
   const passwordRef = useRef<HTMLInputElement>(null);
+  const [errorMessage, setErrorMessage] = useState<string>(
+    "Invalid email or password"
+  );
 
   const [dbData, setDbData] = useState<todoType>([]);
 
@@ -93,10 +97,12 @@ function App() {
       await signInWithEmailAndPassword(auth, email, password);
       setIsLoggedIn(true);
 
+      errorMessageRef.current?.classList.add("hidden");
       setEmail("");
       setPassword("");
     } catch (err) {
       console.error(err);
+      errorMessageRef.current?.classList.remove("hidden");
       setIsLoggedIn(false);
     }
   };
@@ -177,6 +183,10 @@ function App() {
                 }}
               />
             </div>
+
+            <p className="errorMessage hidden" ref={errorMessageRef}>
+              {errorMessage}
+            </p>
 
             <div className="flex flex-row gap-5">
               <button
