@@ -41,6 +41,8 @@ function App() {
     "Invalid email or password"
   );
 
+  console.log(setErrorMessage);
+
   const [dbData, setDbData] = useState<todoType>([]);
 
   const toggleTheme = () => {
