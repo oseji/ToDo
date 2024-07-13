@@ -181,18 +181,29 @@ const MainPage = (props: mainPageProps) => {
     <div>
       <header>
         <div className="themeGrp">
-          <p className={`${!props.themeToggled ? "font-bold" : ""}`}>Light</p>
+          <p
+            className={`${
+              !props.themeToggled ? "font-bold text-blue-500" : ""
+            }`}
+          >
+            Light
+          </p>
 
           <div className="themeSwitcher" onClick={props.toggleTheme}>
             <div className="dot" ref={props.dotRef}></div>
           </div>
 
-          <p className={`${props.themeToggled ? "font-bold" : ""}`}>Dark</p>
+          <p
+            className={`${props.themeToggled ? "font-bold text-blue-500" : ""}`}
+          >
+            Dark
+          </p>
         </div>
 
-        <div className=" flex flex-col md:flex-row items-center gap-2 md:gap-10">
+        <div className=" flex flex-col md:flex-row items-center gap-2 md:gap-14">
           <p className="text-black dark:text-white">
-            Logged in as : <span className=" font-bold">{profile}</span>
+            Logged in as :{" "}
+            <span className=" font-bold text-blue-500">{profile}</span>
           </p>
 
           <button

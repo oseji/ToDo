@@ -11,6 +11,9 @@ export default {
         darkBg: "#0D0D0D",
         lightBg: "#E9E9E9",
       },
+      fontFamily: {
+        Montserrat: ["Montserrat"],
+      },
     },
   },
   darkMode: "selector",
