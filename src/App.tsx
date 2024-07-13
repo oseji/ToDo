@@ -18,6 +18,8 @@ export type todoType = {
   id: string;
   text: string;
   completed: boolean;
+  createdAt: any;
+  updatedAt: any;
 }[];
 
 function App() {
@@ -37,11 +39,7 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [passwordVisibile, setPasswordVisible] = useState<boolean>(false);
   const passwordRef = useRef<HTMLInputElement>(null);
-  const [errorMessage, setErrorMessage] = useState<string>(
-    "Invalid email or password"
-  );
-
-  console.log(setErrorMessage);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const [dbData, setDbData] = useState<todoType>([]);
 
@@ -62,6 +60,16 @@ function App() {
       dotRef.current?.classList.remove("dotAnimation");
       setThemeToggled(false);
     }
+  };
+
+  const errorMessageCleanUp = (text: string) => {
+    return text
+      .replace("Firebase: ", "")
+      .replace("Error ", "")
+      .replace("auth/", "")
+      .replace("(", "")
+      .replace(")", "")
+      .replace(/-/g, " ");
   };
 
   const getTodo = async () => {
@@ -88,8 +96,9 @@ function App() {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       setIsLoggedIn(true);
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      setErrorMessage(errorMessageCleanUp(err.message));
+      errorMessageRef.current?.classList.remove("hidden");
       setIsLoggedIn(false);
     }
   };
@@ -102,8 +111,8 @@ function App() {
       errorMessageRef.current?.classList.add("hidden");
       setEmail("");
       setPassword("");
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      setErrorMessage(errorMessageCleanUp(err.message));
       errorMessageRef.current?.classList.remove("hidden");
       setIsLoggedIn(false);
     }
@@ -116,8 +125,9 @@ function App() {
 
       setEmail("");
       setPassword("");
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      setErrorMessage(errorMessageCleanUp(err.message));
+      errorMessageRef.current?.classList.remove("hidden");
       setIsLoggedIn(false);
     }
   };
@@ -217,7 +227,7 @@ function App() {
                 createAccount();
               }}
             >
-              Click to create account and login
+              Click to create an account and login
             </p>
           </form>
         </div>

@@ -4,6 +4,8 @@ type dbDataType = {
   id: string;
   text: string;
   completed: boolean;
+  createdAt: any;
+  updatedAt: any;
 }[];
 
 type getTodoType = () => Promise<void>;
@@ -46,39 +48,57 @@ const Active = (props: activePagePageProps) => {
           .map((e, i) => (
             <div className="todoBox" key={i}>
               <div className="topTodoGrp">
-                <div className="textGrp">
-                  <input
-                    type="checkbox"
-                    className="checkBox"
-                    checked={e.completed}
-                    onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                      const boxStatus = event.target.checked;
+                <div className="infoGrp">
+                  <div className="textGrp">
+                    <input
+                      type="checkbox"
+                      className="checkBox"
+                      checked={e.completed}
+                      onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                        const boxStatus = event.target.checked;
 
-                      props.updateCompletedStatus(e.id, boxStatus);
-                    }}
-                  />
+                        props.updateCompletedStatus(e.id, boxStatus);
+                      }}
+                    />
 
-                  <div>
-                    <p
-                      className={`todoText ${
-                        e.completed ? " line-through" : ""
-                      }`}
-                    >
-                      {e.text}
-                    </p>
+                    <div>
+                      <p
+                        className={`todoText ${
+                          e.completed ? " line-through" : ""
+                        }`}
+                      >
+                        {e.text}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-row items-center  gap-5">
+                    <button onClick={() => props.deleteTodo(e.id)}>
+                      Delete
+                    </button>
+
+                    {!e.completed && (
+                      <button
+                        onClick={() => {
+                          props.toggleEditForm(e.id);
+                        }}
+                      >
+                        {props.editingId === e.id ? "Close" : "Edit"}
+                      </button>
+                    )}
                   </div>
                 </div>
 
-                <div className="flex flex-row items-center  gap-5">
-                  <button onClick={() => props.deleteTodo(e.id)}>Delete</button>
+                <div className="timestampGrp">
+                  <p className="timestamp">
+                    Created at - {e.createdAt?.toDate().toLocaleString()}
+                  </p>
 
-                  <button
-                    onClick={() => {
-                      props.toggleEditForm(e.id);
-                    }}
-                  >
-                    {props.editingId === e.id ? "Close" : "Edit"}
-                  </button>
+                  {e.updatedAt !== null && (
+                    <p className="timestamp">
+                      Edited at - {e.updatedAt?.toDate().toLocaleString()}
+                    </p>
+                  )}
                 </div>
               </div>
 

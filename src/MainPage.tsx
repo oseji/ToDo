@@ -3,6 +3,7 @@ import { useState, useRef, useEffect, SyntheticEvent, RefObject } from "react";
 import { signOut } from "firebase/auth";
 import { db, auth } from "./config/firebase";
 import {
+  serverTimestamp,
   addDoc,
   deleteDoc,
   updateDoc,
@@ -81,6 +82,8 @@ const MainPage = (props: mainPageProps) => {
           text: inputText,
           completed: false,
           userID: auth?.currentUser?.uid,
+          createdAt: serverTimestamp(),
+          updatedAt: null,
         });
       }
     } catch (err) {
@@ -116,7 +119,10 @@ const MainPage = (props: mainPageProps) => {
           collection(db, `users/${user.email}/userTodos`),
           id
         );
-        await updateDoc(todoDoc, { text: newText });
+        await updateDoc(todoDoc, {
+          text: newText,
+          updatedAt: serverTimestamp(),
+        });
       }
     } catch (err) {
       console.error(err);
@@ -184,7 +190,7 @@ const MainPage = (props: mainPageProps) => {
           <p className={`${props.themeToggled ? "font-bold" : ""}`}>Dark</p>
         </div>
 
-        <div className=" flex flex-col md:flex-row items-center gap-2 md:gap-5">
+        <div className=" flex flex-col md:flex-row items-center gap-2 md:gap-10">
           <p className="text-black dark:text-white">
             Logged in as : <span className=" font-bold">{profile}</span>
           </p>
@@ -218,6 +224,7 @@ const MainPage = (props: mainPageProps) => {
             id="message"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
+            autoComplete="off"
             required
           />
           <button>Submit</button>
