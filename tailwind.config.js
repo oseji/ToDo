@@ -12,7 +12,7 @@ export default {
         lightBg: "#E9E9E9",
       },
       fontFamily: {
-        Montserrat: ["Montserrat"],
+        Montserrat: ["Montserrat", "sans"],
       },
     },
   },
